@@ -77,7 +77,7 @@ class KNearestNeighbor(object):
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-                pass
+                dists[i][j] = np.sqrt(np.sum(np.square(self.X_train[j,:]-X[i,:])))
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -101,7 +101,7 @@ class KNearestNeighbor(object):
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            dists[i,:] = np.transpose(np.sqrt(np.sum(np.square(self.X_train-X[i,:]),axis=1)))
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -131,7 +131,17 @@ class KNearestNeighbor(object):
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # temp = np.expand_dims(self.X_train,axis=0)
+        # # temp.repeat(num_test,axis=0)
+        # X = np.expand_dims(X,axis=1)
+        # # X.repeat(self.X_train.shape[0])
+        # print(temp.shape)
+        # print(X.shape)
+        # dists = np.square(np.sum(np.square(temp-X),axis=1))
+        dists += np.sum(np.square(self.X_train),axis=1).reshape(1,num_train)
+        dists += np.sum(np.square(X),axis=1).reshape(num_test,1)
+        dists -= 2*np.dot(X,self.X_train.T)
+        dists = np.sqrt(dists)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
@@ -164,7 +174,12 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            indexs = np.argsort(dists[i,:])
+            for j in range(k):
+            	# print(j)
+            # 	pass
+            	closest_y.append(self.y_train[indexs[j]])
+            # closest_y.append(self.y_train[indexs[0]])
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
@@ -175,9 +190,21 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+            # print("indexs%d#####%d#" % (i,k))
+            # print("####%d#####%d#" % (i,len(closest_y)))
 
-            pass
-
+            d = {}
+            for index in closest_y:
+            	if index in d:
+            		d[index] += 1
+            	else:
+            		d[index] = 1
+            # if len(closest_y) != 0:
+            y_index = closest_y[0]
+            for k1,v1 in d.items():
+            	if v1>d[y_index]:
+            		y_index = k1
+            y_pred[i] = y_index
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         return y_pred
